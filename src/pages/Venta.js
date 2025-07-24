@@ -16,6 +16,7 @@ const Venta = () => {
     const [empresas, setEmpresas] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedVenta, setSelectedVenta] = useState(null);
+    const [productosDisponibles, setProductosDisponibles] = useState([]);
     const [cargando, setCargando] = useState(false);
     const [alert, setAlert] = useState({
         open: false,
@@ -41,6 +42,20 @@ const Venta = () => {
             setCargando(false)
         }
     };
+    const fetchProductosDisponibles = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/api/inventario/productos`);
+            setProductosDisponibles(response.data);
+        } catch (error) {
+            console.error("Error al cargar los productos del inventario:", error);
+            setAlert({
+                open: true,
+                severity: 'error',
+                message: 'Hubo un error al cargar los productos del inventario',
+            });
+        }
+    };
+
     const fetchEmpleados = async () => {
         try {
             setCargando(true)
@@ -104,30 +119,43 @@ const Venta = () => {
         fetcheVentas();
         fetchEmpleados();
         fetchEmpresas();
+        fetchProductosDisponibles();
     }, [showForm]);
 
     const handleCreate = async (formData) => {
         try {
-            setCargando(true)
+            setCargando(true);
+
+            // Extraemos detalles y el resto de campos para venta
+            const { detalles, ...venta } = formData;
+
+            const payload = {
+                venta,
+                detalles
+            };
+
             if (selectedVenta) {
+                // Actualizar venta (PUT)
+                await axios.put(`${apiUrl}/api/ventas/${selectedVenta.id_venta}`, payload);
 
-                await axios.put(`${apiUrl}/api/ventas/${selectedVenta.id_venta}`, formData);
-
-                const updateVenta = ventas.map((venta) =>
-                    venta.id_venta === selectedVenta.id_venta ? { ...venta, ...formData } : venta
+                const updatedVentas = ventas.map(v =>
+                    v.id_venta === selectedVenta.id_venta ? { ...v, ...venta } : v
                 );
-                setVentas(updateVenta);
+                setVentas(updatedVentas);
+
                 setAlert({
                     open: true,
                     severity: 'success',
-                    message: 'Venta actualizado correctamente',
+                    message: 'Venta actualizada correctamente',
                 });
             } else {
+                // Crear venta (POST)
+                const response = await axios.post(`${apiUrl}/api/ventas`, payload);
 
-                const response = await axios.post(`${apiUrl}/api/updateVenta`, formData);
+                const nuevoId = response.data.idVenta || null;
 
+                setVentas([...ventas, { ...venta, id_venta: nuevoId }]);
 
-                setVentas([...ventas, { ...formData, id_venta: response.data.idVenta }]);
                 setAlert({
                     open: true,
                     severity: 'success',
@@ -135,9 +163,10 @@ const Venta = () => {
                 });
             }
 
-
             setSelectedVenta(null);
             setShowForm(false);
+            fetcheVentas();
+
         } catch (error) {
             console.error("Error al guardar la venta:", error);
             setAlert({
@@ -145,11 +174,11 @@ const Venta = () => {
                 severity: 'error',
                 message: 'Hubo un error al guardar la venta',
             });
-
         } finally {
-            setCargando(false)
+            setCargando(false);
         }
     };
+
 
     const handleEditar = (finalidad) => {
         setSelectedVenta(finalidad);
@@ -210,6 +239,9 @@ const Venta = () => {
                     initialValues={selectedVenta || {}}
                     onSubmit={handleCreate}
                     title={"Venta"}
+                    productos={true}
+                    venta={true}
+                    productosDisponibles={productosDisponibles}
                     onCancel={() => {
                         setShowForm(false);
                         setSelectedVenta(null);
@@ -232,4 +264,4 @@ const Venta = () => {
     );
 };
 
-export default Venta;
+export default Venta; 

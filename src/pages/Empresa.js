@@ -96,13 +96,13 @@ const Empresa = () => {
     const handleDelete = async () => {
         try {
             setCargando(true)
-            const response = await fetch(`${apiUrl}/api/empresas/${selectedEmpresa.id_empresa}`, {
+            const response = await fetch(`${apiUrl}/api/empresas/${selectedEmpresa.idEmpresa}`, {
                 method: "DELETE",
             });
 
             if (response.ok) {
                 // Filtrar los usuarios eliminados de la lista
-                const updateEmpresa = empresas.filter(empresa => empresa.id_empresa !== selectedEmpresa.id_empresa);
+                const updateEmpresa = empresas.filter(empresa => empresa.idEmpresa !== selectedEmpresa.idEmpresa);
                 setEmpresas(updateEmpresa); // Actualizar el estado de users
                 setAlert({
                     open: true,

@@ -1,9 +1,5 @@
 const VentaFormConfig = (empleados, clientes, empresas) => [
-    {
-        name: "idVenta",
-        label: "ID Venta",
-        require: true
-    },
+
     {
         name: "fecha",
         label: "Fecha",
@@ -16,16 +12,16 @@ const VentaFormConfig = (empleados, clientes, empresas) => [
         type: "autocomplete",
         options: empleados,
         getOptionLabel: (option) => `${option.nombre}`,
-        getOptionValue: (option) => option.id_empleado,
+        getOptionValue: (option) => option.idEmpleado,
     },
     {
-        name: "idClientes",
+        name: "idCliente",
         label: "ID Cliente",
         required: true,
         type: "autocomplete",
         options: clientes,
         getOptionLabel: (option) => `${option.nombre}`,
-        getOptionValue: (option) => option.id_cliente,
+        getOptionValue: (option) => option.idCliente,
     },
 
     { name: "montoTotal", label: "Monto Total", type: "text", required: true },
@@ -43,7 +39,7 @@ const VentaFormConfig = (empleados, clientes, empresas) => [
         type: "autocomplete",
         options: empresas,
         getOptionLabel: (option) => `${option.nombre}`,
-        getOptionValue: (option) => option.id_empresa,
+        getOptionValue: (option) => option.idEmpresa,
     },
     {
         name: "metodoPago",

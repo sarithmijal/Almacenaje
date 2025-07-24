@@ -97,7 +97,7 @@ const Proveedor = () => {
     const handleDelete = async () => {
         try {
             setCargando(true)
-            const response = await fetch(`${apiUrl}/api/proveedores/${selectedEC.id_estado_consentimiento}`, {
+            const response = await fetch(`${apiUrl}/api/proveedores/?id_proveedor=${selectedEC.id_proveedor}`, {
                 method: "DELETE",
             });
 

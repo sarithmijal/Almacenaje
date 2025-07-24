@@ -63,10 +63,10 @@ const Cliente = () => {
             setCargando(true)
             if (selectedCliente) {
 
-                await axios.put(`${apiUrl}/api/clientes/${selectedCliente.id_cliente}`, formData);
+                await axios.put(`${apiUrl}/api/clientes/${selectedCliente.idCliente}`, formData);
 
                 const updateCanales = clientes.map((cliente) =>
-                    cliente.id_persona === selectedCliente.id_cliente ? { ...cliente, ...formData } : cliente
+                    cliente.idCliente === selectedCliente.idCliente ? { ...cliente, ...formData } : cliente
                 );
                 setClientes(updateCanales);
                 setAlert({
@@ -84,7 +84,7 @@ const Cliente = () => {
                 const response = await axios.post(`${apiUrl}/api/clientes`, formData);
 
 
-                setClientes([...clientes, { ...formData, id_cliente: response.data.id_cliente }]);
+                setClientes([...clientes, { ...formData, idCliente: response.data.idCliente }]);
                 setAlert({
                     open: true,
                     severity: 'success',
@@ -129,13 +129,13 @@ const Cliente = () => {
     const handleDelete = async () => {
         try {
             setCargando(true)
-            const response = await fetch(`${apiUrl}/api/clientes/${selectedCliente.id_cliente}`, {
+            const response = await fetch(`${apiUrl}/api/clientes/${selectedCliente.idCliente}`, {
                 method: "DELETE",
             });
 
             if (response.ok) {
                 // Filtrar los usuarios eliminados de la lista
-                const updateClientes = clientes.filter(cliente => cliente.id_cliente !== selectedCliente.id_cliente);
+                const updateClientes = clientes.filter(cliente => cliente.idCliente !== selectedCliente.idCliente);
                 setClientes(updateClientes); // Actualizar el estado de users
                 setAlert({
                     open: true,

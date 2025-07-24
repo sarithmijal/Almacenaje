@@ -12,7 +12,7 @@ const DynamicTable = ({
     const [searchText, setSearchText] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const rol = localStorage.getItem("rol")
-
+    console.log(data)
     const filteredData = data.filter((row) =>
         columns.some((col) =>
             String(row[col.field]).toLowerCase().includes(searchText.toLowerCase())

@@ -48,7 +48,7 @@ const Categoria = () => {
             setCargando(true)
             if (selectedCategoria) {
 
-                await axios.put(`${apiUrl}/api/categorias/${selectedCategoria.id_cliente}`, formData);
+                await axios.put(`${apiUrl}/api/categorias/${selectedCategoria.id_categoria}`, formData);
 
                 const updateCanales = categorias.map((categoria) =>
                     categoria.id_categoria === selectedCategoria.id_categoria ? { ...categoria, ...formData } : categoria

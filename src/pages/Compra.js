@@ -13,6 +13,7 @@ const Compra = () => {
     const [compras, setCompras] = useState([]);
     const [proveedores, setProveedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
+    const [productosDisponibles, setProductosDisponibles] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [selectedCompra, setSelectedCompra] = useState(null);
     const [cargando, setCargando] = useState(false);
@@ -22,97 +23,97 @@ const Compra = () => {
         severity: 'success',
         message: '',
     });
+
     const fetchCompras = async () => {
         try {
             const response = await axios.get(`${apiUrl}/api/compras`);
             setCompras(response.data);
         } catch (error) {
             console.error("Error al cargar las compras:", error);
-            setAlert({
-                open: true,
-                severity: 'error',
-                message: 'Hubo un error al cargar las compras',
-            });
+            showAlert('error', 'Hubo un error al cargar las compras');
         }
     };
+
     const fetchProveedores = async () => {
         try {
             const response = await axios.get(`${apiUrl}/api/proveedores`);
             setProveedores(response.data);
         } catch (error) {
             console.error("Error al cargar los proveedores:", error);
-            setAlert({
-                open: true,
-                severity: 'error',
-                message: 'Hubo un error al cargar los proveedores',
-            });
+            showAlert('error', 'Hubo un error al cargar los proveedores');
         }
     };
+
     const fetchEmpresas = async () => {
         try {
             const response = await axios.get(`${apiUrl}/api/empresas`);
             setEmpresas(response.data);
         } catch (error) {
             console.error("Error al cargar las empresas:", error);
-            setAlert({
-                open: true,
-                severity: 'error',
-                message: 'Hubo un error al cargar las empresas',
-            });
+            showAlert('error', 'Hubo un error al cargar las empresas');
         }
+    };
+
+    const fetchProductos = async () => {
+        try {
+            const response = await axios.get(`${apiUrl}/api/productos`);
+            setProductosDisponibles(response.data);
+        } catch (error) {
+            console.error("Error al cargar los productos:", error);
+            showAlert('error', 'Hubo un error al cargar los productos');
+        }
+    };
+
+    const showAlert = (severity, message) => {
+        setAlert({
+            open: true,
+            severity,
+            message,
+        });
     };
 
     useEffect(() => {
         fetchCompras();
         fetchProveedores();
         fetchEmpresas();
-    }, [showForm]);
+        fetchProductos();
+    }, []);
 
-    const handleCreate = async (formData) => {
-        console.log("handleCreate llamado", formData);
+    const handleCreate = async (payload) => {
         try {
-            setCargando(true)
+            setCargando(true);
+
+            // Reestructurar payload
+            const { detalles, ...compraData } = payload;
+            const data = {
+                compra: compraData,
+                detalles: detalles || []
+            };
+
             if (selectedCompra) {
-
-                await axios.put(`${apiUrl}/api/compras/${selectedCompra.idCompra}`, formData);
-
-                const updateCompra = compras.map((claveP) =>
-                    claveP.idCompra === selectedCompra.idCompra ? { ...claveP, ...formData } : claveP
+                await axios.put(`${apiUrl}/api/compras/${selectedCompra.idCompra}`, data);
+                const updatedCompras = compras.map((c) =>
+                    c.idCompra === selectedCompra.idCompra ? { ...c, ...data.compra } : c
                 );
-                setCompras(updateCompra);
-                setAlert({
-                    open: true,
-                    severity: 'success',
-                    message: 'Compra actualizada correctamente',
-                });
+                setCompras(updatedCompras);
+                showAlert('success', 'Compra actualizada correctamente');
             } else {
-                console.log("AQUI")
-                const response = await axios.post(`${apiUrl}/api/compras`, formData);
-                console.log("Respuesta del backend:", response.data);
-
-                setCompras([...compras, { ...formData, idCompra: response.data.idCompra }]);
-                setAlert({
-                    open: true,
-                    severity: 'success',
-                    message: 'Compra creada correctamente',
-                });
+                const response = await axios.post(`${apiUrl}/api/compras`, data);
+                setCompras([...compras, response.data]);
+                showAlert('success', 'Compra creada correctamente');
             }
-
 
             setSelectedCompra(null);
             setShowForm(false);
+            fetchCompras();
         } catch (error) {
             console.error("Error al guardar la compra:", error);
-            setAlert({
-                open: true,
-                severity: 'error',
-                message: 'Hubo un error al guardar la compra',
-            });
-
+            showAlert('error', 'Hubo un error al guardar la compra');
         } finally {
-            setCargando(false)
+            setCargando(false);
         }
     };
+
 
     const handleEditar = (cp) => {
         setSelectedCompra(cp);
@@ -121,39 +122,23 @@ const Compra = () => {
 
     const handleDelete = async () => {
         try {
-            setCargando(true)
-            const response = await fetch(`${apiUrl}/api/compras/${selectedCompra.idCompra}`, {
-                method: "DELETE",
-            });
+            setCargando(true);
+            const response = await axios.delete(`${apiUrl}/api/compras/${selectedCompra.idCompra}`);
 
-            if (response.ok) {
-
-                const updateCompra = compras.filter(cp => cp.idCompra !== selectedCompra.idCompra);
-                setSelectedCompra(updateCompra);
-                setAlert({
-                    open: true,
-                    severity: 'success',
-                    message: 'Compra eliminada con éxito',
-                });
+            if (response.status === 200) {
+                const updatedCompras = compras.filter(c => c.idCompra !== selectedCompra.idCompra);
+                setCompras(updatedCompras);
+                showAlert('success', 'Compra eliminada con éxito');
                 setShowForm(false);
             } else {
-                setAlert({
-                    open: true,
-                    severity: 'error',
-                    message: 'Error al eliminar la compra',
-                });
+                showAlert('error', 'Error al eliminar la compra');
             }
             setSelectedCompra(null);
         } catch (error) {
             console.error("Error al eliminar compra:", error);
-
-            setAlert({
-                open: true,
-                severity: 'error',
-                message: 'Error al eliminar la compra',
-            });
+            showAlert('error', 'Error al eliminar la compra');
         } finally {
-            setCargando(false)
+            setCargando(false);
         }
     };
 
@@ -169,10 +154,12 @@ const Compra = () => {
             {showForm ? (
                 <DynamicForm
                     fields={CompraFormConfig(proveedores, empresas)}
+                    productosDisponibles={productosDisponibles}
                     selectedItem={selectedCompra}
                     initialValues={selectedCompra || {}}
                     onSubmit={handleCreate}
                     title={"Compra"}
+                    productos={true}
                     onCancel={() => {
                         setShowForm(false);
                         setSelectedCompra(null);

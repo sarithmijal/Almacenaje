@@ -6,6 +6,7 @@ const CompraFormConfig = (proveedores, empresas) => [
         type: "text",
         required: true,
     },
+
     {
         name: "fecha",
         label: "Fecha",
@@ -21,16 +22,17 @@ const CompraFormConfig = (proveedores, empresas) => [
         getOptionLabel: (option) => `${option.nombre}`,
         getOptionValue: (option) => option.id_proveedor,
     },
+    { name: "montoTotal", label: "Monto Total", type: "text", required: true },
     { name: "devoluciones", label: "Devoluciones", type: "number", required: true },
 
     {
-        name: "id_empresa",
+        name: "idEmpresa",
         label: "ID EMPRESA",
         required: true,
         type: "autocomplete",
         options: empresas,
         getOptionLabel: (option) => `${option.nombre}`,
-        getOptionValue: (option) => option.id_empresa,
+        getOptionValue: (option) => option.idEmpresa,
     },
 
 

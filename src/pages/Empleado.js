@@ -67,7 +67,7 @@ const Empleado = () => {
                 await axios.put(`${apiUrl}/api/empleados/${selectedEmpleado.id_persona}`, formData);
 
                 const updatedEmpleados = empleados.map((empleado) =>
-                    empleado.id_empleado === selectedEmpleado.id_empleado ? { ...empleado, ...formData } : empleado
+                    empleado.idEmpleado === selectedEmpleado.idEmpleado ? { ...empleado, ...formData } : empleado
                 );
                 setEmpleados(updatedEmpleados);
                 setAlert({
@@ -80,7 +80,7 @@ const Empleado = () => {
                 const response = await axios.post(`${apiUrl}/api/empleados`, formData);
 
 
-                setEmpleados([...empleados, { ...formData, id_empleado: response.data.id_empleado }]);
+                setEmpleados([...empleados, { ...formData, idEmpleado: response.data.idEmpleado }]);
                 setAlert({
                     open: true,
                     severity: 'success',
@@ -112,13 +112,13 @@ const Empleado = () => {
     const handleDelete = async () => {
         try {
             setCargando(true)
-            const response = await fetch(`${apiUrl}/api/empleados/${selectedEmpleado.id_empleado}`, {
+            const response = await fetch(`${apiUrl}/api/empleados/${selectedEmpleado.idEmpleado}`, {
                 method: "DELETE",
             });
 
             if (response.ok) {
 
-                const updatedEmpleados = empleados.filter(empleado => empleado.id_empleado !== selectedEmpleado.id_empleado);
+                const updatedEmpleados = empleados.filter(empleado => empleado.idEmpleado !== selectedEmpleado.idEmpleado);
                 setEmpleados(updatedEmpleados);
                 setAlert({
                     open: true,
